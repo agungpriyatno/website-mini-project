@@ -1,25 +1,25 @@
 "use server";
 
 import {
-  SaleCreateReq,
-  SaleFindManyReq,
-  SaleUpdateReq,
-} from "@/lib/validations/sale";
+  OrderCreateReq,
+  OrderFindManyReq,
+  OrderUpdateReq,
+} from "@/lib/validations/order";
 import db from "../services/database";
 
-export const saleCreate = async (payload: SaleCreateReq) => {
-  const data = await db.sale.create({
+export const orderCreate = async (payload: OrderCreateReq) => {
+  const data = await db.order.create({
     data: {
       customerId: payload.customerId,
       totalPrice: payload.totalPrice,
     },
   });
 
-  await db.salesItem.createMany({
+  await db.orderProduct.createMany({
     skipDuplicates: true,
-    data: payload.items.map((item) => ({
-      saleId: data.id,
-      itemCode: item.itemCode,
+    data: payload.products.map((item) => ({
+      orderId: data.id,
+      productCode: item.productCode,
       quantity: item.quantity,
       totalPrice: item.totalPrice,
     })),
@@ -28,19 +28,26 @@ export const saleCreate = async (payload: SaleCreateReq) => {
   return data;
 };
 
-export const saleUpdate = async (id: string, payload: SaleUpdateReq) => {
-  console.log(payload);
-
-  await db.sale.update({
+export const orderUpdate = async (id: string, payload: OrderUpdateReq) => {
+  await db.order.update({
     where: { id },
     data: {
       customerId: payload.customerId,
       totalPrice: payload.totalPrice,
-      items: {
+      products: { deleteMany: { orderId: id } },
+    },
+  });
+
+  await db.order.update({
+    where: { id },
+    data: {
+      customerId: payload.customerId,
+      totalPrice: payload.totalPrice,
+      products: {
         createMany: {
           skipDuplicates: true,
-          data: payload.items.map((item) => ({
-            itemCode: item.itemCode,
+          data: payload.products.map((item) => ({
+            productCode: item.productCode,
             quantity: item.quantity,
             totalPrice: item.totalPrice,
           })),
@@ -50,28 +57,30 @@ export const saleUpdate = async (id: string, payload: SaleUpdateReq) => {
   });
 };
 
-export const saleDelete = async (id: string) => {
-  const data = await db.sale.delete({ where: { id } });
+export const orderDelete = async (id: string) => {
+  const data = await db.order.delete({ where: { id } });
   return data;
 };
 
-export const saleItemDelete = async (itemCode: string) => {
-  const data = await db.salesItem.deleteMany({ where: { itemCode: itemCode } });
+export const orderItemDelete = async (orderId: string, productCode: string) => {
+  const data = await db.orderProduct.deleteMany({
+    where: { orderId, productCode: productCode },
+  });
   return data;
-}
+};
 
-export const saleFind = async (id: string) => {
-  const data = await db.sale.findUnique({
+export const orderFind = async (id: string) => {
+  const data = await db.order.findUnique({
     where: { id },
     include: {
       customer: true,
-      items: { include: { item: true } },
+      products: { include: { product: true } },
     },
   });
   return data;
 };
 
-export const saleFindMany = async ({
+export const orderFindMany = async ({
   page,
   limit,
   orderField,
@@ -79,8 +88,8 @@ export const saleFindMany = async ({
   startDate,
   endDate,
   customerId,
-  itemCode,
-}: SaleFindManyReq) => {
+  productCode,
+}: OrderFindManyReq) => {
   const order = orderField?.includes(".")
     ? {
         [orderField.split(".")[0]]: {
@@ -88,26 +97,26 @@ export const saleFindMany = async ({
         },
       }
     : { [orderField ?? "createdAt"]: orderType ?? "asc" };
-  const data = await db.sale.findMany({
+  const data = await db.order.findMany({
     take: limit,
     skip: (page - 1) * limit,
     where: {
       createdAt: { gte: startDate ?? undefined, lte: endDate ?? undefined },
       customerId: customerId ?? undefined,
-      items: { some: { itemCode: itemCode ?? undefined } },
+      products: { some: { productCode: productCode ?? undefined } },
     },
     orderBy: { ...order },
     include: {
       customer: true,
-      _count: { select: { items: true } },
+      _count: { select: { products: true } },
     },
   });
 
-  const total = await db.sale.count({
+  const total = await db.order.count({
     where: {
       createdAt: { gte: startDate ?? undefined, lte: endDate ?? undefined },
       customerId: customerId ?? undefined,
-      items: { some: { itemCode: itemCode ?? undefined } },
+      products: { some: { productCode: productCode ?? undefined } },
     },
   });
 

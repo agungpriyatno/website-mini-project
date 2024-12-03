@@ -1,8 +1,7 @@
 "use client";
 
-import { itemFindMany } from "@/lib/server/actions/item";
+import { productFindMany } from "@/lib/server/actions/product";
 import { cn } from "@/lib/utils";
-import { Item } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { CommandLoading } from "cmdk";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -19,6 +18,7 @@ import {
 } from "./ui/command";
 import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Product } from "@prisma/client";
 
 type QueryItemProps = React.HTMLAttributes<HTMLDivElement> & {};
 
@@ -28,7 +28,7 @@ const QueryItem = ({  }: QueryItemProps) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = React.useState<string>("");
   const queryFn = async () => {
-    const resp = await itemFindMany({
+    const resp = await productFindMany({
       page: 1,
       limit: 20,
       search,
@@ -52,7 +52,7 @@ const QueryItem = ({  }: QueryItemProps) => {
     setOpen(val);
   };
 
-  const onSelected = async (data: Item) => {
+  const onSelected = async (data: Product) => {
     await setValue(data.code);
     setOpen(false);
     router.refresh();
@@ -71,7 +71,7 @@ const QueryItem = ({  }: QueryItemProps) => {
         >
           {value
             ? data?.find((item) => item.code === value)?.name
-            : "Select Customer"}
+            : "Select Product"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

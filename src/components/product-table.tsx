@@ -27,10 +27,10 @@ import {
     TableRow,
 } from "./ui/table";
 
-import { ItemFindManyRes } from "@/lib/validations/item";
+
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { ItemDelete } from "./item-delete";
+
 import { QueryDateRange } from "./query-date-range";
 import { QueryOrder } from "./query-order";
 import { QuerySearch } from "./query-search";
@@ -44,10 +44,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "./ui/select";
+import { ProductDelete } from "./product-delete";
+import { ProductFindManyRes } from "@/lib/validations/product";
 
-type ItemTableProps = {
+type ProductTableProps = {
   totalPages: number;
-  data: ItemFindManyRes[];
+  data: ProductFindManyRes[];
 };
 
 const options = [
@@ -64,7 +66,7 @@ const orderOptions = [
   { value: "createdAt", label: "Created At" },
 ];
 
-const ItemTable = ({ data, totalPages }: ItemTableProps) => {
+const ProductTable = ({ data, totalPages }: ProductTableProps) => {
   const router = useRouter();
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [limit, setLimit] = useQueryState(
@@ -87,23 +89,22 @@ const ItemTable = ({ data, totalPages }: ItemTableProps) => {
     router.refresh();
   };
 
-  function formatPrice(price: bigint): string {
+  function formatPrice(price: number): string {
     const formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "IDR",
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-
-    return formatter.format(price); // Assuming price is in cents
+    return formatter.format(price); 
   }
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Item Table</CardTitle>
+        <CardTitle>Product Table</CardTitle>
         <Button>
-          <Link href="/items/create">Create</Link>
+          <Link href="/product/create">Create</Link>
         </Button>
       </CardHeader>
       <CardHeader className="space-y-3">
@@ -146,24 +147,24 @@ const ItemTable = ({ data, totalPages }: ItemTableProps) => {
                 <TableCell>{item.category}</TableCell>
                 <TableCell>{formatPrice(item.price)}</TableCell>
                 <TableCell className="flex place-items-center gap-2">
-                  <span>{item._count.sales}</span>
+                  <span>{item._count.orders}</span>
                   <Button asChild variant={"link"}>
-                    <Link href={`/sales?itemCode=${item.code}`}>View</Link>
+                    <Link href={`/order?itemCode=${item.code}`}>View</Link>
                   </Button>
                 </TableCell>
                 <TableCell>{item.createdAt.toDateString()}</TableCell>
                 <TableCell className="flex justify-end gap-2">
                   <Button asChild size="icon">
-                    <Link href={`/items/${item.code}`}>
+                    <Link href={`/product/${item.code}`}>
                       <InfoIcon />
                     </Link>
                   </Button>
                   <Button asChild size="icon">
-                    <Link href={`/items/${item.code}/update`}>
+                    <Link href={`/product/${item.code}/update`}>
                       <PenIcon />
                     </Link>
                   </Button>
-                  <ItemDelete id={item.code} />
+                  <ProductDelete id={item.code} />
                 </TableCell>
               </TableRow>
             ))}
@@ -239,5 +240,5 @@ const ItemTable = ({ data, totalPages }: ItemTableProps) => {
   );
 };
 
-export { ItemTable };
+export { ProductTable };
 

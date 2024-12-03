@@ -47,7 +47,7 @@ const CustomerUpdate = ({ data }: CustomerUpdateProps) => {
     try {
       await customerUpdate(data.id, {
         name: values.name,
-        domicile: values.domicile,
+        address: values.address,
         gender: values.gender as "MALE" | "FEMALE",
       });
       toast.success("Customer Updated successfully");
@@ -80,13 +80,13 @@ const CustomerUpdate = ({ data }: CustomerUpdateProps) => {
               )}
             />
             <FormField
-              name={"domicile"}
+              name={"address"}
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Domicile</FormLabel>
+                  <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="Domicile" {...field} />
+                    <Input placeholder="Address" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

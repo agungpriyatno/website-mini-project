@@ -28,10 +28,10 @@ const TotalPriceCard = () => {
       });
       return resp;
     },
-    initialData: BigInt(0),
+    initialData: 0,
   });
 
-  function formatPrice(price: bigint): string {
+  function formatPrice(price: number): string {
     const formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "IDR",
@@ -47,7 +47,7 @@ const TotalPriceCard = () => {
         <CardTitle >Total Price</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col justify-center gap-3">
-        <p className="text-2xl font-bold">{formatPrice(data as bigint)}</p>
+        <p className="text-2xl font-bold">{formatPrice(data)}</p>
         <div className={cn("grid gap-2")}>
           <Popover>
             <PopoverTrigger asChild>

@@ -1,9 +1,9 @@
 "use client";
 
-import { itemUpdate } from "@/lib/server/actions/item";
-import { ItemUpdateReq, itemUpdateReq } from "@/lib/validations/item";
+import { productUpdate } from "@/lib/server/actions/product";
+import { ProductUpdateReq, productUpdateReq } from "@/lib/validations/product";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Item } from "@prisma/client";
+import { Product } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,14 +25,14 @@ import {
 } from "./ui/form";
 import { Input } from "./ui/input";
 
-type ItemUpdateProps = {
-  data: Item;
+type ProductUpdateProps = {
+  data: Product;
 };
 
-const ItemUpdate = ({ data }: ItemUpdateProps) => {
+const ProductUpdate = ({ data }: ProductUpdateProps) => {
   const router = useRouter();
-  const form = useForm<ItemUpdateReq>({
-    resolver: zodResolver(itemUpdateReq),
+  const form = useForm<ProductUpdateReq>({
+    resolver: zodResolver(productUpdateReq),
     defaultValues: {
       code: data.code,
       name: data.name,
@@ -43,9 +43,9 @@ const ItemUpdate = ({ data }: ItemUpdateProps) => {
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      await itemUpdate(data.code, values);
+      await productUpdate(data.code, values);
       toast.success("Customer Updated successfully");
-      router.push("/items");
+      router.push("/product");
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong");
@@ -54,7 +54,7 @@ const ItemUpdate = ({ data }: ItemUpdateProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Customer Update</CardTitle>
+        <CardTitle>Product Update</CardTitle>
         <CardDescription></CardDescription>
       </CardHeader>
       <CardContent>
@@ -129,4 +129,4 @@ const ItemUpdate = ({ data }: ItemUpdateProps) => {
   );
 };
 
-export { ItemUpdate };
+export { ProductUpdate };

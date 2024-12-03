@@ -14,12 +14,12 @@ export const NAV_MENU: TNavMenu[] = [
         url: "/customers",
       },
       {
-        title: "Item",
-        url: "/items",
+        title: "Product",
+        url: "/product",
       },
       {
-        title: "Sale",
-        url: "/sales",
+        title: "Order",
+        url: "/order",
       },
     ],
   },

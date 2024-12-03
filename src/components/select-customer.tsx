@@ -2,7 +2,7 @@
 
 import { customerFindMany } from "@/lib/server/actions/customer";
 import { cn } from "@/lib/utils";
-import { SaleCreateReq } from "@/lib/validations/sale";
+
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronsUpDown } from "lucide-react";
 import React, { useState } from "react";
@@ -20,9 +20,10 @@ import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { CommandLoading } from "cmdk";
 import { Customer } from "@prisma/client";
+import { OrderCreateReq } from "@/lib/validations/order";
 
 type SelectCustomerProps = React.HTMLAttributes<HTMLDivElement> & {
-  field: ControllerRenderProps<SaleCreateReq>;
+  field: ControllerRenderProps<OrderCreateReq>;
 };
 
 const SelectCustomer = ({ field }: SelectCustomerProps) => {

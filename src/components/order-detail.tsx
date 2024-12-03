@@ -1,7 +1,7 @@
 "use client";
 
-import { Customer, Item, Sale, SalesItem } from "@prisma/client";
-import Link from "next/link";
+
+import { Customer, Order, OrderProduct, Product } from "@prisma/client";
 import { Button } from "./ui/button";
 import {
   Card,
@@ -19,16 +19,17 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import Link from "next/link";
 
-type SaleDetailProps = {
-  data: Sale & {
+type OrderDetailProps = {
+  data: Order & {
     customer: Customer;
-    items: (SalesItem & { item: Item })[];
+    products: (OrderProduct & { product: Product })[];
   };
 };
 
-const SaleDetail = ({ data }: SaleDetailProps) => {
-  function formatPrice(price: bigint): string {
+const OrderDetail = ({ data }: OrderDetailProps) => {
+  function formatPrice(price: number): string {
     const formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "IDR",
@@ -42,7 +43,7 @@ const SaleDetail = ({ data }: SaleDetailProps) => {
     <div className="flex flex-1 flex-col gap-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Customer Detail</CardTitle>
+          <CardTitle>Order Detail</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -52,8 +53,8 @@ const SaleDetail = ({ data }: SaleDetailProps) => {
                 <TableCell>{data.customer.name}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="font-medium">Domicile</TableCell>
-                <TableCell>{data.customer.domicile}</TableCell>
+                <TableCell className="font-medium">Address</TableCell>
+                <TableCell>{data.customer.address}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="font-medium">Gender</TableCell>
@@ -66,7 +67,7 @@ const SaleDetail = ({ data }: SaleDetailProps) => {
               <TableRow>
                 <TableCell className="font-medium">Total Items</TableCell>
                 <TableCell className="space-x-4">
-                  <span>{data.items.length}</span>
+                  <span>{data.products.length}</span>
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -75,10 +76,10 @@ const SaleDetail = ({ data }: SaleDetailProps) => {
         <CardFooter>
           <div className="flex flex-row justify-end w-full gap-3">
             <Button asChild variant={"outline"}>
-              <Link href="/sales">Back</Link>
+              <Link href="/order">Back</Link>
             </Button>
             <Button asChild>
-              <Link href={`/sales/${data.id}/update`}>Update</Link>
+              <Link href={`/order/${data.id}/update`}>Update</Link>
             </Button>
           </div>
         </CardFooter>
@@ -89,7 +90,7 @@ const SaleDetail = ({ data }: SaleDetailProps) => {
         </CardHeader>
         <CardContent>
           <Table>
-            {data.items.length === 0 && (
+            {data.products.length === 0 && (
               <TableCaption>No data found.</TableCaption>
             )}
             <TableHeader>
@@ -103,7 +104,7 @@ const SaleDetail = ({ data }: SaleDetailProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.items.map(({ item, quantity, totalPrice }, i) => (
+              {data.products.map(({ product: item, quantity, totalPrice }, i) => (
                 <TableRow key={item.code}>
                   <TableCell>{i + 1}</TableCell>
                   <TableCell>{item.code}</TableCell>
@@ -121,5 +122,5 @@ const SaleDetail = ({ data }: SaleDetailProps) => {
   );
 };
 
-export { SaleDetail };
+export { OrderDetail };
 

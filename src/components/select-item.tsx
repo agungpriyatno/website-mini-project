@@ -1,8 +1,7 @@
 "use client";
 
-import { itemFindMany } from "@/lib/server/actions/item";
 import { cn } from "@/lib/utils";
-import { Item } from "@prisma/client";
+import { Product } from "@prisma/client";
 import { useQuery } from "@tanstack/react-query";
 import { CommandLoading } from "cmdk";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -18,9 +17,10 @@ import {
 import { FormControl } from "./ui/form";
 import { Input } from "./ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { productFindMany } from "@/lib/server/actions/product";
 
 type SelectItemProps = React.HTMLAttributes<HTMLDivElement> & {
-  onSelected: (data: Item) => void;
+  onSelected: (data: Product) => void;
   value: string;
 };
 
@@ -28,7 +28,7 @@ const SelectItem = ({ onSelected, value }: SelectItemProps) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = React.useState<string>("");
   const queryFn = async () => {
-    const resp = await itemFindMany({
+    const resp = await productFindMany({
       page: 1,
       limit: 50,
       search,
@@ -52,7 +52,7 @@ const SelectItem = ({ onSelected, value }: SelectItemProps) => {
     setOpen(val);
   };
 
-  const onSelect = (item: Item) => {
+  const onSelect = (item: Product) => {
     onSelected(item);
     setOpen(false);
   };

@@ -32,7 +32,7 @@ export const customerFind = async (id: string) => {
     where: { id },
     include: {
       _count: {
-        select: { sales: true },
+        select: { orders: true },
       },
     },
   });
@@ -59,7 +59,7 @@ export const customerFindMany = async ({
     orderBy: { [orderField ?? "createdAt"]: orderType ?? "asc" },
     include: {
       _count: {
-        select: { sales: true },
+        select: { orders: true },
       },
     },
   });

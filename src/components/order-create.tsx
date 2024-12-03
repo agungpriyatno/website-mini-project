@@ -1,8 +1,6 @@
 "use client";
 
-import { saleCreate } from "@/lib/server/actions/sale";
 import { cn } from "@/lib/utils";
-import { SaleCreateReq, saleCreateReq } from "@/lib/validations/sale";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -28,19 +26,21 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { orderCreate } from "@/lib/server/actions/order";
+import { OrderCreateReq, orderCreateReq } from "@/lib/validations/order";
 
-const SaleCreate = () => {
+const OrderCreate = () => {
   const router = useRouter();
-  const form = useForm<SaleCreateReq>({
-    resolver: zodResolver(saleCreateReq),
+  const form = useForm<OrderCreateReq>({
+    resolver: zodResolver(orderCreateReq),
     defaultValues: {
       customerId: "",
-      totalPrice: BigInt(0),
-      items: [
+      totalPrice: 0,
+      products: [
         {
-          price: BigInt(0),
-          totalPrice: BigInt(0),
-          itemCode: "",
+          price: 0,
+          totalPrice: 0,
+          productCode: "",
           quantity: 1,
         },
       ],
@@ -50,27 +50,27 @@ const SaleCreate = () => {
   const { watch } = form;
 
   const { append, fields, remove } = useFieldArray({
-    name: "items",
+    name: "products",
     control: form.control,
   });
 
-  const items = watch("items");
+  const items = watch("products");
 
 
   const onAppend = () => {
     append({
-      price: BigInt(0),
-      totalPrice: BigInt(0),
-      itemCode: "",
+      price: 0,
+      totalPrice: 0,
+      productCode: "",
       quantity: 1,
     });
   };
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      await saleCreate(values);
-      toast.success("Sale created successfully");
-      router.push("/sales");
+      await orderCreate(values);
+      toast.success("Order created successfully");
+      router.push("/order");
     } catch (error) {
       if (error instanceof Error) {
         console.log(error.message);
@@ -79,7 +79,7 @@ const SaleCreate = () => {
     }
   });
 
-  function formatPrice(price: bigint): string {
+  function formatPrice(price: number): string {
     const formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "IDR",
@@ -90,14 +90,14 @@ const SaleCreate = () => {
   }
 
   const onSetTotalPrice = () => {
-    const total = items.reduce((acc, item) => acc + item.totalPrice, BigInt(0));
+    const total = items.reduce((acc, item) => acc + item.totalPrice, 0);
     form.setValue("totalPrice", total);
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Item Create</CardTitle>
+        <CardTitle>Order Create</CardTitle>
         <CardDescription></CardDescription>
       </CardHeader>
       <CardContent>
@@ -120,17 +120,17 @@ const SaleCreate = () => {
                 <React.Fragment key={i}>
                   <FormField
                     control={form.control}
-                    name={`items.${i}.itemCode`}
+                    name={`products.${i}.productCode`}
                     render={({ field }) => (
                       <div className="flex gap-3 w-full relative">
                         <FormItem className="flex-1 w-full">
                           <SelectItem
                             onSelected={(val) => {
                               field.onChange(val.code);
-                              form.setValue(`items.${i}.price`, val.price);
+                              form.setValue(`products.${i}.price`, val.price);
                               form.setValue(
-                                `items.${i}.totalPrice`,
-                                val.price * BigInt(items[i].quantity)
+                                `products.${i}.totalPrice`,
+                                val.price * items[i].quantity
                               );
                               onSetTotalPrice();
                             }}
@@ -152,12 +152,12 @@ const SaleCreate = () => {
                   />
                   <div
                     className={cn("grid grid-cols-2 gap-3", {
-                      hidden: !items[i].itemCode,
+                      hidden: !items[i].productCode,
                     })}
                   >
                     <FormField
                       control={form.control}
-                      name={`items.${i}.quantity`}
+                      name={`products.${i}.quantity`}
                       key={item.id}
                       render={({ field: { onChange, value } }) => (
                         <FormItem className="flex-1">
@@ -170,8 +170,8 @@ const SaleCreate = () => {
                               onChange={(e) => {
                                 onChange(parseInt(e.target.value));
                                 form.setValue(
-                                  `items.${i}.totalPrice`,
-                                  items[i].price * BigInt(e.target.value)
+                                  `products.${i}.totalPrice`,
+                                  items[i].price * Number(e.target.value)
                                 );
                                 onSetTotalPrice();
                               }}
@@ -184,7 +184,7 @@ const SaleCreate = () => {
                     />
                     <div className="flex gap-3 place-items-center">
                       <p className="flex-1 text-end">
-                        {formatPrice(form.getValues("items")[i].price ?? 0)}
+                        {formatPrice(form.getValues("products")[i].price ?? 0)}
                       </p>
                       <p className="flex-1 text-end">
                         {formatPrice(items[i].totalPrice ?? 0)}
@@ -227,5 +227,5 @@ const SaleCreate = () => {
   );
 };
 
-export { SaleCreate };
+export { OrderCreate };
 

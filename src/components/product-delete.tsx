@@ -1,6 +1,6 @@
 "use client";
 
-import { saleDelete } from "@/lib/server/actions/sale";
+import { productDelete } from "@/lib/server/actions/product";
 import { useMutation } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -18,21 +18,21 @@ import {
 } from "./ui/alert-dialog";
 import { Button } from "./ui/button";
 
-type SaleDeleteProps = {
+type ProductDeleteProps = {
   id: string;
 };
 
-const SaleDelete = ({ id }: SaleDeleteProps) => {
+const ProductDelete = ({ id }: ProductDeleteProps) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const mutationFn = async () => {
-    return await saleDelete(id);
+    return await productDelete(id);
   };
   
   const { mutate, isPending } = useMutation({
     mutationFn,
-    mutationKey: ["SaleDelete", id],
+    mutationKey: ["ProductDelete", id],
     onSuccess: () => {
       toast.success("Item deleted successfully");
       setOpen(false);
@@ -67,5 +67,5 @@ const SaleDelete = ({ id }: SaleDeleteProps) => {
   );
 };
 
-export { SaleDelete };
+export { ProductDelete };
 

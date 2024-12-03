@@ -1,5 +1,6 @@
-import { SaleUpdate } from "@/components/sale-update";
-import { saleFind } from "@/lib/server/actions/sale";
+import { OrderUpdate } from "@/components/order-update";
+import { orderFind } from "@/lib/server/actions/order";
+
 
 type SaleUpdatePageProps = {
   params: Promise<{ id: string }>;
@@ -7,7 +8,7 @@ type SaleUpdatePageProps = {
 
 const SaleUpdatePage = async ({ params }: SaleUpdatePageProps) => {
   const { id } = await params;
-  const data = await saleFind(id);
+  const data = await orderFind(id);
   if (!data) {
     return (
       <main className="flex flex-1 flex-col gap-4 p-4">
@@ -17,7 +18,7 @@ const SaleUpdatePage = async ({ params }: SaleUpdatePageProps) => {
   }
   return (
     <main className="flex flex-1 flex-col gap-4 p-4">
-      <SaleUpdate data={data} />
+      <OrderUpdate data={data} />
     </main>
   );
 };

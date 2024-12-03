@@ -37,7 +37,7 @@ const CustomerCreate = () => {
     resolver: zodResolver(customerCreateReq),
     defaultValues: {
       name: "",
-      domicile: "",
+      address: "",
       gender: "",
     },
   });
@@ -46,7 +46,7 @@ const CustomerCreate = () => {
     try {
       await customerCreate({
         name: values.name,
-        domicile: values.domicile,
+        address: values.address,
         gender: values.gender as "MALE" | "FEMALE",
       });
       toast.success("Customer created successfully");
@@ -79,13 +79,13 @@ const CustomerCreate = () => {
               )}
             />
             <FormField
-              name={"domicile"}
+              name={"address"}
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Domicile</FormLabel>
+                  <FormLabel>Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="Domicile" {...field} />
+                    <Input placeholder="Address" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

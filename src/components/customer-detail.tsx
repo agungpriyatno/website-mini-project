@@ -38,8 +38,8 @@ const CustomerDetail = ({ data }: CustomerDetailProps) => {
               <TableCell>{data.name}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="font-medium">Domicile</TableCell>
-              <TableCell>{data.domicile}</TableCell>
+              <TableCell className="font-medium">Address</TableCell>
+              <TableCell>{data.address}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="font-medium">Gender</TableCell>

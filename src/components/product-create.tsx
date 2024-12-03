@@ -1,7 +1,5 @@
 "use client";
 
-import { itemCreate } from "@/lib/server/actions/item";
-import { itemCreateReq } from "@/lib/validations/item";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -23,25 +21,26 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { productCreate } from "@/lib/server/actions/product";
+import { productCreateReq } from "@/lib/validations/product";
 
-const ItemCreate = () => {
+const ProductCreate = () => {
   const router = useRouter();
-  const price: bigint = BigInt(0);
   const form = useForm({
-    resolver: zodResolver(itemCreateReq),
+    resolver: zodResolver(productCreateReq),
     defaultValues: {
       code: "",
       name: "",
       category: "",
-      price,
+      price: 0,
     },
   });
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      await itemCreate(values);
+      await productCreate(values);
       toast.success("Item created successfully");
-      router.push("/items");
+      router.push("/product");
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong");
@@ -125,4 +124,4 @@ const ItemCreate = () => {
   );
 };
 
-export { ItemCreate };
+export { ProductCreate };

@@ -1,6 +1,5 @@
 "use client";
 
-import { Item } from "@prisma/client";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import {
@@ -11,17 +10,18 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Table, TableBody, TableCell, TableRow } from "./ui/table";
+import { Product } from "@prisma/client";
 
-type ItemDetailProps = {
-  data: Item & {
+type ProductDetailProps = {
+  data: Product & {
     _count: {
-      sales: number;
+      orders: number;
     };
   };
 };
 
-const ItemDetail = ({ data }: ItemDetailProps) => {
-  function formatPrice(price: bigint): string {
+const ProductDetail = ({ data }: ProductDetailProps) => {
+  function formatPrice(price: number): string {
     const formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "IDR",
@@ -62,9 +62,9 @@ const ItemDetail = ({ data }: ItemDetailProps) => {
             <TableRow>
               <TableCell className="font-medium">Total Sales</TableCell>
               <TableCell className="space-x-4">
-                <span>{data._count.sales}</span>
+                <span>{data._count.orders}</span>
                 <Button asChild variant={"link"}>
-                  <Link href={`/sales?itemCode=${data.code}`}>View Sales</Link>
+                  <Link href={`/order?productCode=${data.code}`}>View Sales</Link>
                 </Button>
               </TableCell>
             </TableRow>
@@ -74,10 +74,10 @@ const ItemDetail = ({ data }: ItemDetailProps) => {
       <CardFooter>
         <div className="flex flex-row justify-end w-full gap-3">
           <Button asChild variant={"outline"}>
-            <Link href="/customers">Back</Link>
+            <Link href="/product">Back</Link>
           </Button>
           <Button asChild>
-            <Link href={`/customers/${data.code}/update`}>Update</Link>
+            <Link href={`/product/${data.code}/update`}>Update</Link>
           </Button>
         </div>
       </CardFooter>
@@ -85,4 +85,4 @@ const ItemDetail = ({ data }: ItemDetailProps) => {
   );
 };
 
-export { ItemDetail };
+export { ProductDetail };

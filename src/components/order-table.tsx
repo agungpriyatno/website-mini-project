@@ -27,14 +27,15 @@ import {
   TableRow,
 } from "./ui/table";
 
-import { SaleFindManyRes } from "@/lib/validations/sale";
+
+import { OrderFindManyRes } from "@/lib/validations/order";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
+import { OrderDelete } from "./order-delete";
 import { QueryCustomer } from "./query-customer";
 import { QueryDateRange } from "./query-date-range";
 import { QueryItem } from "./query-item";
 import { QueryOrder } from "./query-order";
-import { SaleDelete } from "./sale-delete";
 import { Pagination, PaginationContent, PaginationItem } from "./ui/pagination";
 import {
   Select,
@@ -46,9 +47,9 @@ import {
   SelectValue,
 } from "./ui/select";
 
-type SaleTableProps = {
+type OrderTableProps = {
   totalPages: number;
-  data: SaleFindManyRes[];
+  data: OrderFindManyRes[];
 };
 
 
@@ -58,7 +59,7 @@ const orderOptions = [
   { value: "createdAt", label: "Created At" },
 ];
 
-const SaleTable = ({ data, totalPages }: SaleTableProps) => {
+const OrderTable = ({ data, totalPages }: OrderTableProps) => {
   const router = useRouter();
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
   const [limit, setLimit] = useQueryState(
@@ -81,7 +82,7 @@ const SaleTable = ({ data, totalPages }: SaleTableProps) => {
     router.refresh();
   };
 
-  function formatPrice(price: bigint): string {
+  function formatPrice(price: number): string {
     const formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "IDR",
@@ -95,9 +96,9 @@ const SaleTable = ({ data, totalPages }: SaleTableProps) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Sale Table</CardTitle>
+        <CardTitle>Order Table</CardTitle>
         <Button>
-          <Link href="/sales/create">Create</Link>
+          <Link href="/order/create">Create</Link>
         </Button>
       </CardHeader>
       <CardHeader className="space-y-3">
@@ -136,7 +137,7 @@ const SaleTable = ({ data, totalPages }: SaleTableProps) => {
                 </TableCell>
                 <TableCell>{item.customer.name}</TableCell>
                 <TableCell className="flex place-items-center gap-2">
-                  <span>{item._count.items}</span>
+                  <span>{item._count.orders}</span>
                   <Button asChild variant={"link"}>
                     View
                   </Button>
@@ -147,16 +148,16 @@ const SaleTable = ({ data, totalPages }: SaleTableProps) => {
                 </TableCell>
                 <TableCell className="flex justify-end gap-2">
                   <Button asChild size="icon">
-                    <Link href={`/sales/${item.id}`}>
+                    <Link href={`/order/${item.id}`}>
                       <InfoIcon />
                     </Link>
                   </Button>
                   <Button asChild size="icon">
-                    <Link href={`/sales/${item.id}/update`}>
+                    <Link href={`/order/${item.id}/update`}>
                       <PenIcon />
                     </Link>
                   </Button>
-                  <SaleDelete id={item.id} />
+                  <OrderDelete id={item.id} />
                 </TableCell>
               </TableRow>
             ))}
@@ -232,5 +233,5 @@ const SaleTable = ({ data, totalPages }: SaleTableProps) => {
   );
 };
 
-export { SaleTable };
+export { OrderTable };
 

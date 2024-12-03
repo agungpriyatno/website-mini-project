@@ -1,9 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { saleUpdateReq, SaleUpdateReq } from "@/lib/validations/sale";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Item, Sale, SalesItem } from "@prisma/client";
+import { OrderProduct, Order, Product } from "@prisma/client";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -28,27 +28,29 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
-import { saleItemDelete, saleUpdate } from "@/lib/server/actions/sale";
-import { useMutation } from "@tanstack/react-query";
 
-type TSaleItem = SalesItem & { item: Item };
-type SaleUpdateProps = {
-  data: Sale & {
-    items: TSaleItem[];
+import { useMutation } from "@tanstack/react-query";
+import { orderUpdateReq, OrderUpdateReq } from "@/lib/validations/order";
+import { orderItemDelete, orderUpdate } from "@/lib/server/actions/order";
+
+type TOrderProduct = OrderProduct & { product: Product };
+type OrderUpdateProps = {
+  data: Order & {
+    products: TOrderProduct[];
   };
 };
 
-const SaleUpdate = ({ data }: SaleUpdateProps) => {
+const OrderUpdate = ({ data }: OrderUpdateProps) => {
   const router = useRouter();
-  const form = useForm<SaleUpdateReq>({
-    resolver: zodResolver(saleUpdateReq),
+  const form = useForm<OrderUpdateReq>({
+    resolver: zodResolver(orderUpdateReq),
     defaultValues: {
       customerId: data.customerId,
       totalPrice: data.totalPrice,
-      items: data.items.map((item) => ({
-        itemCode: item.itemCode,
+      products: data.products.map((item) => ({
+        productCode: item.productCode,
         quantity: item.quantity,
-        price: item.item.price,
+        price: item.product.price,
         totalPrice: item.totalPrice,
       })),
     },
@@ -57,26 +59,26 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
   const { watch } = form;
 
   const { append, fields, remove } = useFieldArray({
-    name: "items",
+    name: "products",
     control: form.control,
   });
 
-  const items = watch("items");
+  const items = watch("products");
 
   const onAppend = () => {
     append({
-      price: BigInt(0),
-      totalPrice: BigInt(0),
-      itemCode: "",
+      price: 0,
+      totalPrice: 0,
+      productCode: "",
       quantity: 1,
     });
   };
 
   const onSubmit = form.handleSubmit(async (values) => {
     try {
-      await saleUpdate(data.id, values);
+      await orderUpdate(data.id, values);
       toast.success("Sale created successfully");
-      router.push("/sales");
+      router.push("/order");
     } catch (error) {
       if (error instanceof Error) {
         console.log(error.message);
@@ -85,7 +87,7 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
     }
   });
 
-  function formatPrice(price: bigint): string {
+  function formatPrice(price: number): string {
     const formatter = new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "IDR",
@@ -96,13 +98,13 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
   }
 
   const onSetTotalPrice = () => {
-    const total = items.reduce((acc, item) => acc + item.totalPrice, BigInt(0));
+    const total = items.reduce((acc, item) => acc + item.totalPrice, 0);
     form.setValue("totalPrice", total);
   };
 
   const { mutate } = useMutation({
     mutationFn: async (itemCode: string) => {
-      await saleItemDelete(itemCode);
+      await orderItemDelete(data.id, itemCode);
     },
     onSuccess: () => {
       toast.success("Item deleted successfully");
@@ -115,7 +117,7 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Item Create</CardTitle>
+        <CardTitle>Order Create</CardTitle>
         <CardDescription></CardDescription>
       </CardHeader>
       <CardContent>
@@ -133,22 +135,22 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
               )}
             />
             <div className="p-4 border rounded space-y-4">
-              <h3 className="text-lg font-semibold">Items</h3>
+              <h3 className="text-lg font-semibold">Product</h3>
               {fields.map((item, i) => (
                 <React.Fragment key={i}>
                   <FormField
                     control={form.control}
-                    name={`items.${i}.itemCode`}
+                    name={`products.${i}.productCode`}
                     render={({ field }) => (
                       <div className="flex gap-3 w-full relative">
                         <FormItem className="flex-1 w-full">
                           <SelectItem
                             onSelected={(val) => {
                               field.onChange(val.code);
-                              form.setValue(`items.${i}.price`, val.price);
+                              form.setValue(`products.${i}.price`, val.price);
                               form.setValue(
-                                `items.${i}.totalPrice`,
-                                val.price * BigInt(items[i].quantity)
+                                `products.${i}.totalPrice`,
+                                val.price * items[i].quantity
                               );
                               onSetTotalPrice();
                             }}
@@ -159,7 +161,7 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
                         <Button
                           type="button"
                           onClick={() => {
-                            const itemCode = data.items[i].itemCode;
+                            const itemCode = data.products[i].productCode;
                             if (itemCode) mutate(itemCode);
                             remove(fields.length - 1);
                             onSetTotalPrice();
@@ -175,12 +177,12 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
                   />
                   <div
                     className={cn("grid grid-cols-2 gap-3", {
-                      hidden: !items[i].itemCode,
+                      hidden: !items[i].productCode,
                     })}
                   >
                     <FormField
                       control={form.control}
-                      name={`items.${i}.quantity`}
+                      name={`products.${i}.quantity`}
                       key={item.id}
                       render={({ field: { onChange, value } }) => (
                         <FormItem className="flex-1">
@@ -193,8 +195,8 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
                               onChange={(e) => {
                                 onChange(parseInt(e.target.value));
                                 form.setValue(
-                                  `items.${i}.totalPrice`,
-                                  items[i].price * BigInt(e.target.value ?? 0)
+                                  `products.${i}.totalPrice`,
+                                  items[i].price * Number(e.target.value ?? 0)
                                 );
                                 onSetTotalPrice();
                               }}
@@ -207,7 +209,7 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
                     />
                     <div className="flex gap-3 place-items-center">
                       <p className="flex-1 text-end">
-                        {formatPrice(form.getValues("items")[i].price ?? 0)}
+                        {formatPrice(form.getValues("products")[i].price ?? 0)}
                       </p>
                       <p className="flex-1 text-end">
                         {formatPrice(items[i].totalPrice ?? 0)}
@@ -250,4 +252,4 @@ const SaleUpdate = ({ data }: SaleUpdateProps) => {
   );
 };
 
-export { SaleUpdate };
+export { OrderUpdate };

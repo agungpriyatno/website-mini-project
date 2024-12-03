@@ -9,7 +9,7 @@ export const totalPriceSale = async ({
   startDate: string;
   endDate: string;
 }) => {
-  const data = await db.sale.aggregate({
+  const data = await db.order.aggregate({
     where: {
       createdAt: {
         gte: startDate,

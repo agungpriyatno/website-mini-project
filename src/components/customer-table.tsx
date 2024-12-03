@@ -52,13 +52,13 @@ type CustomerTableProps = {
 
 const options = [
   { value: "name", label: "Name" },
-  { value: "domicile", label: "Domicile" },
+  { value: "addres", label: "Address" },
   { value: "gender", label: "Gender" },
 ];
 
 const orderOptions = [
   { value: "name", label: "Name" },
-  { value: "domicile", label: "Domicile" },
+  { value: "addres", label: "Address" },
   { value: "gender", label: "Gender" },
   { value: "createdAt", label: "Created At" },
 ];
@@ -112,7 +112,7 @@ const CustomerTable = ({ data, totalPages }: CustomerTableProps) => {
             <TableRow>
               <TableHead>No</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Domicile</TableHead>
+              <TableHead>Address</TableHead>
               <TableHead>Gender</TableHead>
               <TableHead>Sales Total</TableHead>
               <TableHead>Created At</TableHead>
@@ -124,12 +124,12 @@ const CustomerTable = ({ data, totalPages }: CustomerTableProps) => {
               <TableRow key={item.id}>
                 <TableCell>{page * limit - limit + data.indexOf(item) + 1}</TableCell>
                 <TableCell className="font-medium">{item.name}</TableCell>
-                <TableCell>{item.domicile}</TableCell>
+                <TableCell>{item.address}</TableCell>
                 <TableCell>{item.gender}</TableCell>
                 <TableCell className="flex place-items-center gap-2">
                   <span>{item._count.sales}</span>
                   <Button asChild variant={"link"}>
-                    <Link href={`/sales?customerId=${item.id}`}>View</Link>
+                    <Link href={`/order?customerId=${item.id}`}>View</Link>
                   </Button>
                 </TableCell>
                 <TableCell>{item.createdAt.toDateString()}</TableCell>

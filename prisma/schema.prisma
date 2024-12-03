@@ -13,54 +13,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model Customer {
   id        String   @id @default(cuid())
   name      String
-  domicile  String
+  address  String
   gender    String
-  sales     Sale[]
+  orders    Order[]
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("customers")
 }
 
-model Sale {
+model Order {
   id         String @id @default(cuid())
   customerId String @map("customer_id")
 
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
-  totalPrice BigInt   @map("total_price")
+  totalPrice Float    @map("total_price")
 
-  customer Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  items    SalesItem[]
+  customer Customer       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  products OrderProduct[]
 
-  @@map("sales")
+  @@map("orders")
 }
 
-model Item {
+model Product {
   code      String   @id
   name      String
-  price     BigInt
-  category  String?  @map("category_code")
+  price     Float
+  category  String? 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  sales SalesItem[]
+  orders OrderProduct[]
 
-  @@map("items")
+  @@map("products")
 }
 
-model SalesItem {
-  saleId     String @map("sale_id")
-  itemCode   String @map("item_id")
-  quantity   Int
-  totalPrice BigInt @map("total_price")
-  sale       Sale   @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  item       Item   @relation(fields: [itemCode], references: [code], onDelete: Cascade)
+model OrderProduct {
+  orderId     String  @map("order_id")
+  productCode String  @map("product_code")
+  quantity    Int
+  totalPrice  Float  @map("total_price")
+  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product @relation(fields: [productCode], references: [code], onDelete: Cascade)
 
-  @@id([saleId, itemCode])
-  @@map("sales_items")
+  @@id([productCode, orderId])
+  @@map("order_products")
 }

@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const customerCreateReq = z.object({
   name: z.string().min(1),
-  domicile: z.string().min(1),
+  address: z.string().min(1),
   gender: z.enum(["MALE", "FEMALE"]),
 });
 

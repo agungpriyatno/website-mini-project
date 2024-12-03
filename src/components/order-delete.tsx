@@ -1,6 +1,6 @@
 "use client";
 
-import { itemDelete } from "@/lib/server/actions/item";
+
 import { useMutation } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -17,22 +17,23 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import { Button } from "./ui/button";
+import { orderDelete } from "@/lib/server/actions/order";
 
-type ItemDeleteProps = {
+type OrderDeleteProps = {
   id: string;
 };
 
-const ItemDelete = ({ id }: ItemDeleteProps) => {
+const OrderDelete = ({ id }: OrderDeleteProps) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const mutationFn = async () => {
-    return await itemDelete(id);
+    return await orderDelete(id);
   };
   
   const { mutate, isPending } = useMutation({
     mutationFn,
-    mutationKey: ["itemDelete", id],
+    mutationKey: ["OrderDelete", id],
     onSuccess: () => {
       toast.success("Item deleted successfully");
       setOpen(false);
@@ -67,5 +68,5 @@ const ItemDelete = ({ id }: ItemDeleteProps) => {
   );
 };
 
-export { ItemDelete };
+export { OrderDelete };
 
